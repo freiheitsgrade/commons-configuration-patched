@@ -25,9 +25,10 @@
     <version>50</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
+  <groupId>consulting.freiheitsgrade.patched</groupId>
   <artifactId>commons-configuration2</artifactId>
   <version>2.7</version>
-  <name>Apache Commons Configuration</name>
+  <name>Apache Commons Configuration patched by Freiheitsgrade</name>
 
   <inceptionYear>2001</inceptionYear>
   <description>
@@ -35,29 +36,25 @@
         various formats
     </description>
 
-  <url>https://commons.apache.org/proper/commons-configuration/</url>
-
-  <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/browse/CONFIGURATION</url>
-  </issueManagement>
-
-  <ciManagement>
-    <system>jenkins</system>
-    <url>https://builds.apache.org/job/Commons-configuration/</url>
-  </ciManagement>
+  <url>https://github.com/freiheitsgrade/commons-configuration-patched/</url>
 
   <scm>
-    <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-configuration.git</connection>
-    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-configuration.git</developerConnection>
-    <url>https://gitbox.apache.org/repos/asf?p=commons-configuration.git</url>
+    <connection>scm:git:https://github.com/freiheitsgrade/commons-configuration-patched.git</connection>
+    <developerConnection>scm:git:https://github.com/freiheitsgrade/commons-configuration-patched.git</developerConnection>
+    <url>https://github.com/freiheitsgrade/commons-configuration-patched</url>
   </scm>
 
   <distributionManagement>
-    <site>
-      <id>apache.website</id>
-      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-configuration/</url>
-    </site>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <name>Nexus Release Repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
   </distributionManagement>
 
   <developers>
@@ -403,7 +400,6 @@
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <version>1.26</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -547,8 +543,10 @@
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-configuration</commons.scmPubUrl>
-
+    <japicmp.skip>true</japicmp.skip>
+    <commons.osgi.symbolicName>consulting.freiheitsgrade.patched.org.apache.commons.${commons.packageId}</commons.osgi.symbolicName>
     <!-- Explicitly declare optional dependencies for the OSGi manifest. -->
+    <commons.osgi.excludeDependencies>false</commons.osgi.excludeDependencies>
     <commons.osgi.import>
       org.apache.commons.beanutils.*;resolution:=optional,
       org.apache.commons.codec.*;resolution:=optional,
@@ -584,7 +582,7 @@
   </properties>
 
   <build>
-   <defaultGoal>clean verify apache-rat:check japicmp:cmp checkstyle:check spotbugs:check javadoc:javadoc</defaultGoal>
+   <defaultGoal>clean verify checkstyle:check spotbugs:check javadoc:javadoc</defaultGoal>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -644,6 +642,57 @@
       </plugins>
     </pluginManagement>
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.springframework:*</exclude>
+                </excludes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.commons.configuration2</pattern>
+                  <shadedPattern>consulting.freiheitsgrade.patched.commons.configuration2</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.commons.configuration2</pattern>
+                  <shadedPattern>consulting.freiheitsgrade.patched.commons.configuration2</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com</pattern>
+                  <shadedPattern>consulting.freiheitsgrade.patched.dependencies.com</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache</pattern>
+                  <shadedPattern>consulting.freiheitsgrade.patched.dependencies.org.apache</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.yaml</pattern>
+                  <shadedPattern>consulting.freiheitsgrade.patched.dependencies.org.yaml</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>okio</pattern>
+                  <shadedPattern>consulting.freiheitsgrade.patched.dependencies.okio</shadedPattern>
+                </relocation>
+              </relocations>
+              <createSourcesJar>true</createSourcesJar>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

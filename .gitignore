@@ -1,6 +1,7 @@
 # Maven build files
 target
 *.log
+dependency-reduced-pom.xml
 maven-eclipse.xml
 build.properties
 site-content
@@ -18,3 +19,12 @@ site-content
 .project
 .externalToolBuilders
 .checkstyle
+
+# jenv
+.java-version
+
+# Mac OS specific
+.DS_Store
+
+# Shellscripts to be ignored
+*.sh.ignore
